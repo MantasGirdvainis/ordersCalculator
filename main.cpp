@@ -174,6 +174,81 @@ void spausdintiSumas(ostream &out, double kainos[], int kiekiai[], int n) {
     out << "Galutinė mokėtina suma:        " << galutine << " Eur" << endl;
 }
 
+double kategorijosSuma(string kategorija, string kategorijos[], double kainos[], int kiekiai[], int n) {
+    double suma = 0;
+    for (int i = 0; i < n; i++) {
+        if (kategorijos[i] == kategorija) {
+            double eilutesSumaPries = eilutesSuma(kainos[i], kiekiai[i]);
+            suma = suma + eilutesSumaPries - nuolaida(eilutesSumaPries, kiekiai[i]);
+        }
+    }
+    return suma;
+}
+
+string pasirinktiKategorija() {
+    int nr;
+    cout << endl;
+    cout << "1 - Dviraciai" << endl;
+    cout << "2 - Dalys" << endl;
+    cout << "3 - Aksesuarai" << endl;
+    cout << "Pasirinkite kategoriją: ";
+    cin >> nr;
+    while (cin.fail() || nr < 1 || nr > 3) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "Tokios kategorijos nėra. Pasirinkite nuo 1 iki 3: ";
+        cin >> nr;
+    }
+
+    if (nr == 1) {
+        return "Dviraciai";
+    } else if (nr == 2) {
+        return "Dalys";
+    } else {
+        return "Aksesuarai";
+    }
+}
+
+void spausdintiKategorijosPrekes(ostream &out, string kategorija, string kategorijos[], string pavadinimai[],
+                                 double kainos[], int kiekiai[], int n) {
+    int rasta = 0;
+    for (int i = 0; i < n; i++) {
+        if (kategorijos[i] == kategorija) {
+            rasta++;
+        }
+    }
+
+    if (rasta == 0) {
+        out << "Kategorijos " << kategorija << " prekių užsakyme nėra." << endl;
+        return;
+    }
+
+    spausdintiLentelesAntraste(out);
+    int nr = 1;
+    for (int i = 0; i < n; i++) {
+        if (kategorijos[i] == kategorija) {
+            spausdintiPrekesEilute(out, nr, kategorijos[i], pavadinimai[i], kainos[i], kiekiai[i]);
+            nr++;
+        }
+    }
+
+    out << fixed << setprecision(2);
+    out << "Kategorijos " << kategorija << " mokėtina suma: "
+        << kategorijosSuma(kategorija, kategorijos, kainos, kiekiai, n) << " Eur" << endl;
+}
+
+void spausdintiKategorijuSumas(ostream &out, string kategorijos[], double kainos[], int kiekiai[], int n) {
+    string visosKategorijos[3] = {"Dviraciai", "Dalys", "Aksesuarai"};
+
+    out << fixed << setprecision(2);
+    out << "Mokėtinos sumos pagal kategorijas:" << endl;
+    for (int k = 0; k < 3; k++) {
+        out << left << setw(12) << visosKategorijos[k]
+            << right << setw(12) << kategorijosSuma(visosKategorijos[k], kategorijos, kainos, kiekiai, n)
+            << " Eur" << endl;
+    }
+}
+
 int main() {
     string kategorijos[MAX_PREKIU];
     string pavadinimai[MAX_PREKIU];
@@ -210,8 +285,16 @@ int main() {
                 cout << endl;
                 spausdintiSumas(cout, kainos, kiekiai, prekiuKiekis);
                 break;
-            case 2:
+            case 2: {
+                string kategorija = pasirinktiKategorija();
+                cout << endl;
+                spausdintiKategorijosPrekes(cout, kategorija, kategorijos, pavadinimai, kainos, kiekiai, prekiuKiekis);
+                break;
+            }
             case 4:
+                cout << endl;
+                spausdintiKategorijuSumas(cout, kategorijos, kainos, kiekiai, prekiuKiekis);
+                break;
             case 5:
             case 6:
                 cout << "Ši funkcija dar neįgyvendinta." << endl;
