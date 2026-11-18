@@ -249,6 +249,29 @@ void spausdintiKategorijuSumas(ostream &out, string kategorijos[], double kainos
     }
 }
 
+void isvestiAtaskaita(ostream &out, string kategorijos[], string pavadinimai[], double kainos[], int kiekiai[], int n) {
+    out << "=== DVIRAČIŲ PARDUOTUVĖS UŽSAKYMO ATASKAITA ===" << endl;
+    out << endl;
+    spausdintiPrekes(out, kategorijos, pavadinimai, kainos, kiekiai, n);
+    out << endl;
+    spausdintiSumas(out, kainos, kiekiai, n);
+    out << endl;
+    spausdintiKategorijuSumas(out, kategorijos, kainos, kiekiai, n);
+}
+
+bool issaugotiAtaskaita(string failoPavadinimas, string kategorijos[], string pavadinimai[],
+                        double kainos[], int kiekiai[], int n) {
+    ofstream fout(failoPavadinimas);
+    if (!fout.is_open()) {
+        return false;
+    }
+
+    isvestiAtaskaita(fout, kategorijos, pavadinimai, kainos, kiekiai, n);
+    fout.close();
+
+    return !fout.fail();
+}
+
 int main() {
     string kategorijos[MAX_PREKIU];
     string pavadinimai[MAX_PREKIU];
@@ -296,8 +319,15 @@ int main() {
                 spausdintiKategorijuSumas(cout, kategorijos, kainos, kiekiai, prekiuKiekis);
                 break;
             case 5:
+                cout << endl;
+                isvestiAtaskaita(cout, kategorijos, pavadinimai, kainos, kiekiai, prekiuKiekis);
+                break;
             case 6:
-                cout << "Ši funkcija dar neįgyvendinta." << endl;
+                if (issaugotiAtaskaita("ataskaita.txt", kategorijos, pavadinimai, kainos, kiekiai, prekiuKiekis)) {
+                    cout << "Ataskaita sėkmingai išsaugota faile ataskaita.txt" << endl;
+                } else {
+                    cout << "Klaida: nepavyko išsaugoti ataskaitos faile ataskaita.txt" << endl;
+                }
                 break;
             case 7:
                 cout << "Programa uždaryta" << endl;
