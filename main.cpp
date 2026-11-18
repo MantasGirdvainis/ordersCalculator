@@ -100,6 +100,80 @@ int nuskaitytiDuomenis(string failoPavadinimas, string kategorijos[], string pav
     return n;
 }
 
+double eilutesSuma(double kaina, int kiekis) {
+    return kaina * kiekis;
+}
+
+double nuolaida(double suma, int kiekis) {
+    if (kiekis >= 10) {
+        return suma * 0.10;
+    }
+    return 0;
+}
+
+double sumaPriesNuolaidas(double kainos[], int kiekiai[], int n) {
+    double suma = 0;
+    for (int i = 0; i < n; i++) {
+        suma = suma + eilutesSuma(kainos[i], kiekiai[i]);
+    }
+    return suma;
+}
+
+double bendraNuolaida(double kainos[], int kiekiai[], int n) {
+    double suma = 0;
+    for (int i = 0; i < n; i++) {
+        double eilutesSumaPries = eilutesSuma(kainos[i], kiekiai[i]);
+        suma = suma + nuolaida(eilutesSumaPries, kiekiai[i]);
+    }
+    return suma;
+}
+
+void spausdintiLentelesAntraste(ostream &out) {
+    out << left << setw(4) << "Nr"
+        << setw(12) << "Kategorija"
+        << setw(48) << "Pavadinimas"
+        << right << setw(10) << "Kaina"
+        << setw(8) << "Kiekis"
+        << setw(12) << "Suma"
+        << setw(10) << "Nuolaida"
+        << setw(12) << "Moketi" << endl;
+    out << string(116, '-') << endl;
+}
+
+void spausdintiPrekesEilute(ostream &out, int nr, string kategorija, string pavadinimas, double kaina, int kiekis) {
+    double suma = eilutesSuma(kaina, kiekis);
+    double nuolaidosSuma = nuolaida(suma, kiekis);
+    double moketi = suma - nuolaidosSuma;
+
+    out << fixed << setprecision(2);
+    out << left << setw(4) << nr
+        << setw(12) << kategorija
+        << setw(48) << pavadinimas
+        << right << setw(10) << kaina
+        << setw(8) << kiekis
+        << setw(12) << suma
+        << setw(10) << nuolaidosSuma
+        << setw(12) << moketi << endl;
+}
+
+void spausdintiPrekes(ostream &out, string kategorijos[], string pavadinimai[], double kainos[], int kiekiai[], int n) {
+    spausdintiLentelesAntraste(out);
+    for (int i = 0; i < n; i++) {
+        spausdintiPrekesEilute(out, i + 1, kategorijos[i], pavadinimai[i], kainos[i], kiekiai[i]);
+    }
+}
+
+void spausdintiSumas(ostream &out, double kainos[], int kiekiai[], int n) {
+    double pries = sumaPriesNuolaidas(kainos, kiekiai, n);
+    double nuolaidos = bendraNuolaida(kainos, kiekiai, n);
+    double galutine = pries - nuolaidos;
+
+    out << fixed << setprecision(2);
+    out << "Užsakymo suma prieš nuolaidas: " << pries << " Eur" << endl;
+    out << "Bendra nuolaidų suma:          " << nuolaidos << " Eur" << endl;
+    out << "Galutinė mokėtina suma:        " << galutine << " Eur" << endl;
+}
+
 int main() {
     string kategorijos[MAX_PREKIU];
     string pavadinimai[MAX_PREKIU];
@@ -129,8 +203,14 @@ int main() {
 
         switch (pasirinkimas) {
             case 1:
-            case 2:
+                cout << endl;
+                spausdintiPrekes(cout, kategorijos, pavadinimai, kainos, kiekiai, prekiuKiekis);
+                break;
             case 3:
+                cout << endl;
+                spausdintiSumas(cout, kainos, kiekiai, prekiuKiekis);
+                break;
+            case 2:
             case 4:
             case 5:
             case 6:
